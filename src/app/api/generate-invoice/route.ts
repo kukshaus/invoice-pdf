@@ -1,9 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import clientPromise from '@/lib/mongodb';
-import Invoice from '@/lib/models/Invoice';
-import { pdf } from '@react-pdf/renderer';
-import { InvoicePDF } from '@/components/InvoicePDF';
 import { getTranslation, formatDateLocalized } from '@/lib/translations';
+
+// Conditional MongoDB imports
+let clientPromise: any = null;
+let Invoice: any = null;
+
+if (process.env.MONGODB_URI) {
+  try {
+    clientPromise = require('@/lib/mongodb').default;
+    Invoice = require('@/lib/models/Invoice').default;
+  } catch (error) {
+    console.log('MongoDB imports not available');
+  }
+}
 
 // Complete invoice data interface matching the frontend structure
 interface InvoiceItem {
@@ -349,31 +358,52 @@ export async function POST(request: NextRequest) {
     // Generate HTML preview
     const htmlPreview = generateHTMLPreview(invoiceData);
 
-    // Generate PDF
-    let pdfBuffer: Buffer | null = null;
-    try {
-      const pdfDoc = await pdf(<InvoicePDF data={invoiceData} />).toBuffer();
-      pdfBuffer = pdfDoc;
-    } catch (pdfError) {
-      console.error('PDF generation error:', pdfError);
-      // Continue without PDF if generation fails
-    }
-
-    // Connect to MongoDB and save invoice
+    // Connect to MongoDB and save invoice (optional)
     let savedInvoice = null;
-    try {
-      await clientPromise;
-      const invoice = new Invoice({
-        ...invoiceData,
-        totals,
-        htmlPreview,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
-      savedInvoice = await invoice.save();
-    } catch (dbError) {
-      console.error('Database error:', dbError);
-      // Continue without database if it fails
+    if (process.env.MONGODB_URI) {
+      try {
+        await clientPromise;
+        
+        // Transform data to match the Invoice model schema
+        const invoiceDataForDB = {
+          invoiceNumber: `${invoiceData.general.invoiceNumberPrefix} ${invoiceData.general.invoiceNumberValue}`,
+          issueDate: new Date(invoiceData.general.issueDate),
+          dueDate: new Date(invoiceData.general.dueDate),
+          currency: invoiceData.general.currency,
+          language: invoiceData.general.language,
+          seller: {
+            name: invoiceData.seller.name,
+            address: invoiceData.seller.address,
+            vatNumber: invoiceData.seller.vatNumber,
+            email: invoiceData.seller.email,
+            accountNumber: invoiceData.seller.accountNumber,
+            swiftBic: invoiceData.seller.swiftBic,
+          },
+          buyer: {
+            name: invoiceData.buyer.name,
+            address: invoiceData.buyer.address,
+            vatNumber: invoiceData.buyer.vatNumber,
+            email: invoiceData.buyer.email,
+          },
+          items: invoiceData.items.map(item => ({
+            description: item.description,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+            vatRate: item.vatRate,
+          })),
+          template: invoiceData.template,
+          totals,
+          htmlPreview,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+        
+        const invoice = new Invoice(invoiceDataForDB);
+        savedInvoice = await invoice.save();
+      } catch (dbError) {
+        console.error('Database error:', dbError);
+        // Continue without database if it fails
+      }
     }
 
     // Prepare response
@@ -393,12 +423,6 @@ export async function POST(request: NextRequest) {
       response.data.databaseId = savedInvoice._id.toString();
     }
 
-    // Add PDF as base64 if generated
-    if (pdfBuffer) {
-      response.data.pdfBase64 = pdfBuffer.toString('base64');
-      response.data.pdfSize = pdfBuffer.length;
-    }
-
     return NextResponse.json(response);
 
   } catch (error) {
@@ -416,6 +440,14 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   try {
+    if (!process.env.MONGODB_URI) {
+      return NextResponse.json({
+        success: true,
+        data: [],
+        message: 'MongoDB not configured'
+      });
+    }
+    
     await clientPromise;
     const invoices = await Invoice.find({}).sort({ createdAt: -1 }).limit(10);
     

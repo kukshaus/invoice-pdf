@@ -101,24 +101,17 @@ async function testAPI() {
       console.log(`💰 Subtotal: €${result.data.totals.subtotal.toFixed(2)}`);
       console.log(`🧾 VAT: €${result.data.totals.vat.toFixed(2)}`);
       console.log(`💳 Total: €${result.data.totals.total.toFixed(2)}`);
-      console.log(`📊 PDF Size: ${result.data.pdfSize} bytes`);
       
       if (result.data.databaseId) {
         console.log(`💾 Database ID: ${result.data.databaseId}`);
       }
       
       console.log('\n📋 HTML Preview length:', result.data.htmlPreview.length, 'characters');
-      console.log('📄 PDF Base64 length:', result.data.pdfBase64.length, 'characters');
       
       // Save HTML preview to file
       const fs = require('fs');
       fs.writeFileSync('invoice-preview.html', result.data.htmlPreview);
       console.log('💾 HTML preview saved to: invoice-preview.html');
-      
-      // Save PDF to file
-      const pdfBuffer = Buffer.from(result.data.pdfBase64, 'base64');
-      fs.writeFileSync('invoice.pdf', pdfBuffer);
-      console.log('💾 PDF saved to: invoice.pdf');
       
     } else {
       console.error('❌ API Error:', result.error);
