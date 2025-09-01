@@ -338,6 +338,13 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const invoiceData: InvoiceData = body;
+    
+    // Check if additional JSON data is requested
+    const includeJsonData = body.includeJsonData === true;
+    
+    // Check if HTML response is requested via URL parameter
+    const url = new URL(request.url);
+    const returnHtml = url.searchParams.get('html') === 'true';
 
     // Validate the invoice data
     const validation = validateInvoiceData(invoiceData);
@@ -358,17 +365,22 @@ export async function POST(request: NextRequest) {
     // Generate HTML preview
     const htmlPreview = generateHTMLPreview(invoiceData);
 
-    // Generate PDF
+    // Generate PDF and HTML content
     let pdfBuffer: Buffer | null = null;
+    let pdfHtml: string | null = null;
+    
     try {
       console.log('Starting PDF generation...');
-      const { pdf } = await import('@react-pdf/renderer');
-      console.log('PDF renderer imported successfully');
-      const { InvoicePDFDocument } = await import('@/lib/pdf-generator-basic');
-      console.log('PDF document component imported successfully');
-      const pdfDoc = await pdf(InvoicePDFDocument({ data: invoiceData })).toBuffer();
-      pdfBuffer = pdfDoc;
+      const { generatePDF, generateHTML } = await import('@/lib/pdf-generator-puppeteer');
+      console.log('PDF generator imported successfully');
+      
+      // Generate PDF
+      pdfBuffer = await generatePDF(invoiceData);
       console.log('PDF generated successfully, size:', pdfBuffer.length, 'bytes');
+      
+      // Generate HTML for JSON response
+      pdfHtml = generateHTML(invoiceData);
+      console.log('HTML generated successfully');
     } catch (pdfError) {
       console.error('PDF generation error:', pdfError);
       // Continue without PDF if generation fails
@@ -422,30 +434,81 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Prepare response
-    const response: any = {
-      success: true,
-      data: {
-        invoiceNumber: `${invoiceData.general.invoiceNumberPrefix} ${invoiceData.general.invoiceNumberValue}`,
-        totals,
-        htmlPreview,
-        message: 'Invoice generated successfully'
+    // Prepare response based on includeJsonData parameter
+    if (includeJsonData) {
+      // Return full JSON response with all data
+      const response: any = {
+        success: true,
+        data: {
+          invoiceNumber: `${invoiceData.general.invoiceNumberPrefix} ${invoiceData.general.invoiceNumberValue}`,
+          totals,
+          htmlPreview,
+          message: 'Invoice generated successfully'
+        }
+      };
+
+      // Add database ID if saved
+      if (savedInvoice) {
+        response.data.id = savedInvoice._id;
+        response.data.databaseId = savedInvoice._id.toString();
       }
-    };
 
-    // Add database ID if saved
-    if (savedInvoice) {
-      response.data.id = savedInvoice._id;
-      response.data.databaseId = savedInvoice._id.toString();
-    }
+             // Add PDF as base64 if generated
+       if (pdfBuffer) {
+         response.data.pdfBase64 = pdfBuffer.toString('base64');
+         response.data.pdfSize = pdfBuffer.length;
+       }
+       
+       // Add PDF HTML if generated
+       if (pdfHtml) {
+         response.data.pdfHtml = pdfHtml;
+         response.data.pdfHtmlBase64 = Buffer.from(pdfHtml, 'utf-8').toString('base64');
+         response.data.pdfHtmlSize = Buffer.from(pdfHtml, 'utf-8').length;
+       }
 
-    // Add PDF as base64 if generated
-    if (pdfBuffer) {
-      response.data.pdfBase64 = pdfBuffer.toString('base64');
-      response.data.pdfSize = pdfBuffer.length;
-    }
-
-    return NextResponse.json(response);
+      return NextResponse.json(response);
+         } else {
+       // Return PDF by default, or HTML if requested via URL parameter
+       if (returnHtml) {
+         // Return HTML content when ?html=true is specified
+         if (pdfHtml) {
+           return new NextResponse(pdfHtml, {
+             headers: {
+               'Content-Type': 'text/html',
+               'Content-Disposition': `attachment; filename="invoice-${invoiceData.general.invoiceNumberPrefix}${invoiceData.general.invoiceNumberValue}.html"`,
+               'Content-Length': Buffer.from(pdfHtml, 'utf-8').length.toString()
+             }
+           });
+         } else {
+           return NextResponse.json(
+             { 
+               success: false,
+               error: 'HTML generation failed'
+             },
+             { status: 500 }
+           );
+         }
+       } else {
+         // Return PDF by default
+         if (pdfBuffer) {
+           return new NextResponse(pdfBuffer, {
+             headers: {
+               'Content-Type': 'application/pdf',
+               'Content-Disposition': `attachment; filename="invoice-${invoiceData.general.invoiceNumberPrefix}${invoiceData.general.invoiceNumberValue}.pdf"`,
+               'Content-Length': pdfBuffer.length.toString()
+             }
+           });
+         } else {
+           return NextResponse.json(
+             { 
+               success: false,
+               error: 'PDF generation failed'
+             },
+             { status: 500 }
+           );
+         }
+       }
+     }
 
   } catch (error) {
     console.error('Error generating invoice:', error);

@@ -30,7 +30,7 @@ interface LocaleContent {
 
 const content: Record<string, LocaleContent> = {
   en: {
-    title: "EasyInvoicePDF",
+    title: "InvoicePDF",
     subtitle: "Create professional invoices with ease. Generate beautiful PDF invoices, manage templates, and share with your clients in seconds.",
     features: [
       {
@@ -67,7 +67,7 @@ const content: Record<string, LocaleContent> = {
       subtitle: "Trusted by freelancers and businesses worldwide",
       items: [
         {
-          text: "EasyInvoicePDF has streamlined our invoicing process completely. The templates are professional and the PDF quality is excellent.",
+          text: "InvoicePDF has streamlined our invoicing process completely. The templates are professional and the PDF quality is excellent.",
           author: "Sarah Johnson",
           role: "Freelance Designer"
         },
@@ -90,7 +90,7 @@ const content: Record<string, LocaleContent> = {
     }
   },
   de: {
-    title: "EasyInvoicePDF",
+    title: "InvoicePDF",
     subtitle: "Erstellen Sie professionelle Rechnungen mit Leichtigkeit. Generieren Sie schöne PDF-Rechnungen, verwalten Sie Vorlagen und teilen Sie sie in Sekunden mit Ihren Kunden.",
     features: [
       {
@@ -127,7 +127,7 @@ const content: Record<string, LocaleContent> = {
       subtitle: "Vertraut von Freiberuflern und Unternehmen weltweit",
       items: [
         {
-          text: "EasyInvoicePDF hat unseren Rechnungsprozess vollständig optimiert. Die Vorlagen sind professionell und die PDF-Qualität ist ausgezeichnet.",
+          text: "InvoicePDF hat unseren Rechnungsprozess vollständig optimiert. Die Vorlagen sind professionell und die PDF-Qualität ist ausgezeichnet.",
           author: "Sarah Johnson",
           role: "Freiberufliche Designerin"
         },
@@ -150,7 +150,7 @@ const content: Record<string, LocaleContent> = {
     }
   },
   fr: {
-    title: "EasyInvoicePDF",
+    title: "InvoicePDF",
     subtitle: "Créez des factures professionnelles facilement. Générez de belles factures PDF, gérez les modèles et partagez avec vos clients en quelques secondes.",
     features: [
       {
@@ -187,7 +187,7 @@ const content: Record<string, LocaleContent> = {
       subtitle: "Fait confiance par les freelances et les entreprises du monde entier",
       items: [
         {
-          text: "EasyInvoicePDF a complètement rationalisé notre processus de facturation. Les modèles sont professionnels et la qualité PDF est excellente.",
+          text: "InvoicePDF a complètement rationalisé notre processus de facturation. Les modèles sont professionnels et la qualité PDF est excellente.",
           author: "Sarah Johnson",
           role: "Designer Freelance"
         },
@@ -248,7 +248,7 @@ export default function LocaleAboutPage({ params }: { params: { locale: string }
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Why Choose EasyInvoicePDF?
+              Why Choose InvoicePDF?
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Professional invoice generation made simple and efficient

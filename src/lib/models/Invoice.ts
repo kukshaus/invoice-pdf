@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
 
 // Sanitize input data
-const sanitizeString = (str: string): string => {
+const sanitizeString = (str: string | undefined): string => {
+  if (!str) return '';
   return str.replace(/[<>]/g, '').trim();
 };
 
@@ -18,21 +19,11 @@ const InvoiceSchema = new mongoose.Schema({
   },
   issueDate: { 
     type: Date, 
-    required: true,
-    validate: {
-      validator: (v: Date) => v <= new Date(),
-      message: 'Issue date cannot be in the future'
-    }
+    required: true
   },
   dueDate: { 
     type: Date, 
-    required: true,
-    validate: {
-      validator: function(this: any, v: Date) {
-        return v >= this.issueDate;
-      },
-      message: 'Due date must be after or equal to issue date'
-    }
+    required: true
   },
   currency: { 
     type: String, 
@@ -66,9 +57,8 @@ const InvoiceSchema = new mongoose.Schema({
     },
     email: { 
       type: String, 
-      required: true,
       validate: {
-        validator: (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
+        validator: (v: string) => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
         message: 'Invalid email format'
       }
     },
@@ -103,9 +93,8 @@ const InvoiceSchema = new mongoose.Schema({
     },
     email: { 
       type: String, 
-      required: true,
       validate: {
-        validator: (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
+        validator: (v: string) => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
         message: 'Invalid email format'
       }
     },
@@ -141,13 +130,36 @@ const InvoiceSchema = new mongoose.Schema({
     enum: ['default', 'stripe'], 
     default: 'default' 
   },
+  shareableLink: {
+    id: { 
+      type: String, 
+      unique: true, 
+      sparse: true 
+    },
+    isActive: { 
+      type: Boolean, 
+      default: false 
+    },
+    password: { 
+      type: String, 
+      default: null 
+    },
+    createdAt: { 
+      type: Date, 
+      default: null 
+    },
+    expiresAt: { 
+      type: Date, 
+      default: null 
+    }
+  },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
 
-// Add indexes for better performance
-InvoiceSchema.index({ invoiceNumber: 1 });
+// Add indexes for better performance (avoid duplicates with unique fields)
 InvoiceSchema.index({ createdAt: -1 });
 InvoiceSchema.index({ 'seller.email': 1 });
+InvoiceSchema.index({ 'shareableLink.isActive': 1, 'shareableLink.expiresAt': 1 });
 
 export default mongoose.models.Invoice || mongoose.model('Invoice', InvoiceSchema);

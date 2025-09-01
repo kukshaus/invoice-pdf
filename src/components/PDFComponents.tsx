@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { PDFDownloadLink, PDFViewer } from '@react-pdf/renderer';
 import { InvoicePDF } from './InvoicePDF';
 import { X, Download } from 'lucide-react';
@@ -17,20 +17,39 @@ export const PDFComponents: React.FC<PDFComponentsProps> = ({
   showPreview, 
   onClosePreview 
 }) => {
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (showPreview) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    // Cleanup function to reset overflow when component unmounts
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [showPreview]);
+
   return (
     <ClientOnly fallback={<div>Loading PDF components...</div>}>
       {showPreview ? (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-4 w-full h-full max-w-4xl max-h-[90vh] relative">
-            <button
-              onClick={onClosePreview}
-              className="absolute top-4 right-4 z-10 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 transition-colors"
-            >
-              <X className="h-6 w-6" />
-            </button>
-            <PDFViewer style={{ width: '100%', height: '100%' }}>
-              <InvoicePDF data={data} />
-            </PDFViewer>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
+          <div className="bg-white rounded-xl p-6 w-full h-full max-w-6xl max-h-[95vh] relative shadow-2xl">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">PDF Preview</h3>
+              <button
+                onClick={onClosePreview}
+                className="bg-gray-100 hover:bg-gray-200 rounded-full p-2 transition-colors"
+              >
+                <X className="h-5 w-5 text-gray-600" />
+              </button>
+            </div>
+            <div className="w-full h-[calc(100%-4rem)] border border-gray-200 rounded-lg overflow-hidden">
+              <PDFViewer style={{ width: '100%', height: '100%', border: 'none' }}>
+                <InvoicePDF data={data} />
+              </PDFViewer>
+            </div>
           </div>
         </div>
       ) : (

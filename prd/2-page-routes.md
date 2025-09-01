@@ -14,7 +14,7 @@ Routes:
 
 Page Implementations:
 /about:
-Core Purpose: Landing page showcasing EasyInvoicePDF features and benefits
+Core Purpose: Landing page showcasing InvoicePDF features and benefits
 Key Components:
 - Hero section with main value proposition
 - Feature highlights grid

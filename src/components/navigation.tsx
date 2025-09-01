@@ -19,7 +19,7 @@ export default function Navigation() {
           <div className="flex items-center space-x-8">
             <Link href="/" className="flex items-center space-x-2">
               <FileText className="h-8 w-8 text-blue-600" />
-              <span className="text-xl font-bold text-gray-900">EasyInvoicePDF</span>
+              <span className="text-xl font-bold text-gray-900">InvoicePDF</span>
             </Link>
             
             <div className="hidden md:flex items-center space-x-6">

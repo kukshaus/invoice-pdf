@@ -14,20 +14,20 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "EasyInvoicePDF - Professional Invoice Generator",
+  title: "InvoicePDF - Professional Invoice Generator",
   description: "Create professional invoices with ease. Generate PDF invoices, manage templates, and share with clients.",
   keywords: "invoice generator, PDF invoices, professional invoices, business invoices",
-  authors: [{ name: "EasyInvoicePDF Team" }],
+  authors: [{ name: "InvoicePDF Team" }],
   robots: "index, follow",
   openGraph: {
-    title: "EasyInvoicePDF - Professional Invoice Generator",
+    title: "InvoicePDF - Professional Invoice Generator",
     description: "Create professional invoices with ease. Generate PDF invoices, manage templates, and share with clients.",
     type: "website",
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "EasyInvoicePDF - Professional Invoice Generator",
+    title: "InvoicePDF - Professional Invoice Generator",
     description: "Create professional invoices with ease. Generate PDF invoices, manage templates, and share with clients.",
   },
 };

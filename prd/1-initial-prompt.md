@@ -121,7 +121,7 @@ Create detailed components with these requirements:
    - You MUST complete the entire prompt before stopping
 
 <summary_title>
-EasyInvoicePDF - Professional Invoice Generator Dashboard
+InvoicePDF - Professional Invoice Generator Dashboard
 </summary_title>
 
 <image_analysis>

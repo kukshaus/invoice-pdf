@@ -10,7 +10,7 @@ export default function AboutPage() {
           <div className="text-center">
             <div className="flex items-center justify-center mb-6">
               <FileText className="h-12 w-12 text-blue-600 mr-3" />
-              <h1 className="text-4xl font-bold text-gray-900">EasyInvoicePDF</h1>
+              <h1 className="text-4xl font-bold text-gray-900">InvoicePDF</h1>
             </div>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
               Create professional invoices with ease. Generate beautiful PDF invoices, 
@@ -36,7 +36,7 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Why Choose EasyInvoicePDF?
+              Why Choose InvoicePDF?
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Professional invoice generation made simple and efficient
@@ -163,7 +163,7 @@ export default function AboutPage() {
                 ))}
               </div>
               <p className="text-gray-600 mb-4">
-                "EasyInvoicePDF has streamlined our invoicing process completely. 
+                "InvoicePDF has streamlined our invoicing process completely. 
                 The templates are professional and the PDF quality is excellent."
               </p>
               <div className="flex items-center">

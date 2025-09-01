@@ -1,7 +1,7 @@
 # Authentication & Security Implementation Guide
 
 ## Overview
-EasyInvoicePDF is designed as a no-signup required application, but includes several security and authentication mechanisms for API access, subscription management, and admin features.
+InvoicePDF is designed as a no-signup required application, but includes several security and authentication mechanisms for API access, subscription management, and admin features.
 
 ## 1. Environment Variables Setup
 
@@ -552,9 +552,9 @@ export async function subscribeAction(email: string) {
     
     // Send confirmation email
     await resend.emails.send({
-      from: "EasyInvoicePDF <noreply@easyinvoicepdf.com>",
+      from: "InvoicePDF <noreply@easyinvoicepdf.com>",
       to: email,
-      subject: "Welcome to EasyInvoicePDF!",
+      subject: "Welcome to InvoicePDF!",
       react: ConfirmSubscriptionEmail(),
     });
 

@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { HTMLPreview } from '@/components/HTMLPreview';
 import { SellerModal } from '@/components/SellerModal';
+import { HowItWorksModal } from '@/components/HowItWorksModal';
+import { GenerateLinkModal } from '@/components/GenerateLinkModal';
 import { formatDate, formatCurrency } from '@/lib/utils';
 import { InvoicePDF } from '@/components/InvoicePDF';
 import { getTranslation } from '@/lib/translations';
@@ -104,8 +106,28 @@ export default function Home() {
     notes: true,
     signature: true
   });
-  const [showSupportPopup, setShowSupportPopup] = useState(true);
+  const [showSupportPopup, setShowSupportPopup] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  // Use useEffect to check localStorage after component mounts
+  React.useEffect(() => {
+    setIsClient(true);
+    const dismissedAt = localStorage.getItem('supportPopupDismissed');
+    if (dismissedAt) {
+      const now = Date.now();
+      const fiveMinutes = 5 * 60 * 1000; // 5 minutes in milliseconds
+      if (now - parseInt(dismissedAt) < fiveMinutes) {
+        setShowSupportPopup(false);
+      } else {
+        setShowSupportPopup(true);
+      }
+    } else {
+      setShowSupportPopup(true);
+    }
+  }, []);
   const [showSellerModal, setShowSellerModal] = useState(false);
+  const [showHowItWorksModal, setShowHowItWorksModal] = useState(false);
+  const [showGenerateLinkModal, setShowGenerateLinkModal] = useState(false);
 
   const toggleSection = (section: string) => {
     setCollapsedSections(prev => ({
@@ -296,14 +318,19 @@ export default function Home() {
                   <FileText className="h-6 w-6 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">EasyInvoicePDF</h1>
+                  <h1 className="text-2xl font-bold text-gray-900">InvoicePDF</h1>
                   <p className="text-sm text-gray-500">Free Invoice Generator with Live PDF Preview</p>
                 </div>
-                <div className="hidden md:flex items-center space-x-4 ml-8 text-sm text-gray-600">
-                  <a href="#" className="hover:text-blue-600 transition-colors">How it works</a>
-                  <span>|</span>
-                  <a href="#" className="hover:text-blue-600 transition-colors">Share your feedback</a>
-                </div>
+                                 <div className="hidden md:flex items-center space-x-4 ml-8 text-sm text-gray-600">
+                   <button 
+                     onClick={() => setShowHowItWorksModal(true)}
+                     className="hover:text-blue-600 transition-colors"
+                   >
+                     How it works
+                   </button>
+                   <span>|</span>
+                   <a href="#" className="hover:text-blue-600 transition-colors">Share your feedback</a>
+                 </div>
               </div>
               
               <div className="flex items-center space-x-3">
@@ -323,7 +350,10 @@ export default function Home() {
                   <span className="hidden sm:inline">Support Project</span>
                 </button>
                 
-                <button className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                <button 
+                  onClick={() => setShowGenerateLinkModal(true)}
+                  className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                >
                   <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                   </svg>
@@ -1078,7 +1108,7 @@ export default function Home() {
                   <FileText className="h-5 w-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900">EasyInvoicePDF</h3>
+                  <h3 className="text-lg font-bold text-gray-900">InvoicePDF</h3>
                   <p className="text-sm text-gray-500">Professional Invoice Generator</p>
                 </div>
               </div>
@@ -1173,7 +1203,7 @@ export default function Home() {
                 <a href="#" className="hover:text-gray-900 transition-colors">GDPR</a>
               </div>
               <div className="mt-4 md:mt-0 text-sm text-gray-500">
-                © 2024 EasyInvoicePDF. All rights reserved.
+                © 2024 InvoicePDF. All rights reserved.
               </div>
             </div>
           </div>
@@ -1181,13 +1211,17 @@ export default function Home() {
       </footer>
 
       {/* Floating Support Popup */}
-      {showSupportPopup && (
+      {isClient && showSupportPopup && (
         <div className="fixed bottom-6 right-6 z-50">
           <div className="bg-white rounded-xl shadow-xl border border-gray-200 p-4 max-w-sm">
             <div className="flex items-start justify-between mb-3">
               <h3 className="text-lg font-semibold text-gray-900">Support My Work</h3>
               <button 
-                onClick={() => setShowSupportPopup(false)}
+                onClick={() => {
+                  setShowSupportPopup(false);
+                  // Save dismissal timestamp to localStorage
+                  localStorage.setItem('supportPopupDismissed', Date.now().toString());
+                }}
                 className="text-gray-400 hover:text-gray-600 transition-colors"
               >
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1222,6 +1256,19 @@ export default function Home() {
         onClose={() => setShowSellerModal(false)}
         sellerData={invoiceData.seller}
         onSave={handleSaveSeller}
+      />
+
+      {/* How It Works Modal */}
+      <HowItWorksModal
+        isOpen={showHowItWorksModal}
+        onClose={() => setShowHowItWorksModal(false)}
+      />
+
+      {/* Generate Link Modal */}
+      <GenerateLinkModal
+        isOpen={showGenerateLinkModal}
+        onClose={() => setShowGenerateLinkModal(false)}
+        invoiceData={invoiceData}
       />
     </div>
   );

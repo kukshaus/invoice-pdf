@@ -92,7 +92,7 @@ export default function ConfirmSubscriptionPage() {
                 Subscription Confirmed!
               </h2>
               <p className="text-gray-600 mb-4">
-                Thank you for subscribing to EasyInvoicePDF updates. 
+                Thank you for subscribing to InvoicePDF updates. 
                 You'll receive notifications about new features and improvements.
               </p>
               {email && (

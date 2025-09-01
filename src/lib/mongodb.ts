@@ -9,9 +9,6 @@ const options = {
   maxPoolSize: 10, // Limit connection pool
   serverSelectionTimeoutMS: 5000, // Timeout after 5s
   socketTimeoutMS: 45000, // Close sockets after 45s
-  bufferMaxEntries: 0, // Disable mongoose buffering
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
 };
 
 // Validate MongoDB URI format

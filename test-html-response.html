@@ -1,0 +1,295 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Invoice - INV- 2024-TEST-001</title>
+        <style>
+            @page {
+                size: A4;
+                margin: 20mm;
+            }
+            body { 
+                font-family: Arial, sans-serif; 
+                margin: 0; 
+                padding: 0; 
+                background: #ffffff; 
+                font-size: 12px;
+                line-height: 1.4;
+                color: #333;
+            }
+            .invoice-container { 
+                max-width: 100%; 
+                margin: 0; 
+                background: white; 
+                padding: 0; 
+            }
+            .header { 
+                display: flex; 
+                justify-content: space-between; 
+                margin-bottom: 30px; 
+                border-bottom: 2px solid #333;
+                padding-bottom: 20px;
+            }
+            .title { 
+                font-size: 24px; 
+                font-weight: bold; 
+                color: #333; 
+                margin-bottom: 5px; 
+            }
+            .invoice-number { 
+                color: #666; 
+                font-size: 14px; 
+            }
+            .company-name {
+                font-size: 18px;
+                font-weight: bold;
+                color: #333;
+            }
+            .details { 
+                display: grid; 
+                grid-template-columns: 1fr 1fr; 
+                gap: 40px; 
+                margin-bottom: 30px; 
+            }
+            .seller-info h3 { 
+                margin: 0 0 10px 0; 
+                color: #333; 
+                font-size: 14px;
+            }
+            .seller-info p { 
+                margin: 5px 0; 
+                color: #666; 
+                font-size: 12px;
+            }
+            .invoice-details { 
+                text-align: right; 
+            }
+            .detail-item { 
+                margin-bottom: 10px; 
+            }
+            .detail-label { 
+                font-size: 10px; 
+                color: #666; 
+                text-transform: uppercase; 
+                font-weight: bold; 
+            }
+            .detail-value { 
+                font-size: 12px; 
+                color: #333; 
+            }
+            .billing-section { 
+                display: grid; 
+                grid-template-columns: 1fr 1fr; 
+                gap: 20px; 
+                margin-bottom: 30px; 
+            }
+            .bill-to, .ship-to { 
+                background: #f8f9fa; 
+                padding: 15px; 
+                border-radius: 6px; 
+            }
+            .bill-to h3, .ship-to h3 { 
+                margin: 0 0 10px 0; 
+                font-size: 10px; 
+                color: #666; 
+                text-transform: uppercase; 
+            }
+            .bill-to h4, .ship-to h4 { 
+                margin: 0 0 5px 0; 
+                color: #333; 
+                font-size: 12px;
+            }
+            .bill-to p, .ship-to p { 
+                margin: 3px 0; 
+                color: #666; 
+                font-size: 10px; 
+            }
+            table { 
+                width: 100%; 
+                border-collapse: collapse; 
+                margin-bottom: 30px; 
+            }
+            th { 
+                background: #f8f9fa; 
+                padding: 8px; 
+                text-align: left; 
+                font-size: 10px; 
+                color: #666; 
+                text-transform: uppercase; 
+                font-weight: bold; 
+                border-bottom: 1px solid #ddd;
+            }
+            td { 
+                padding: 8px; 
+                border-bottom: 1px solid #eee; 
+                font-size: 11px; 
+            }
+            .text-right { 
+                text-align: right; 
+            }
+            .totals { 
+                text-align: right; 
+                margin-bottom: 30px; 
+            }
+            .total-row { 
+                display: flex; 
+                justify-content: space-between; 
+                margin-bottom: 8px; 
+                min-width: 200px; 
+            }
+            .total-label { 
+                color: #666; 
+                font-size: 11px;
+            }
+            .total-value { 
+                font-weight: bold; 
+                color: #333; 
+                font-size: 11px;
+            }
+            .final-total { 
+                border-top: 2px solid #333; 
+                padding-top: 10px; 
+                font-size: 14px; 
+                font-weight: bold; 
+            }
+            .payment-info, .notes { 
+                background: #f8f9fa; 
+                padding: 15px; 
+                border-radius: 6px; 
+                margin-bottom: 20px; 
+            }
+            .payment-info h3, .notes h3 { 
+                margin: 0 0 10px 0; 
+                font-size: 12px; 
+                color: #333; 
+                text-transform: uppercase; 
+            }
+            .signature { 
+                text-align: right; 
+                margin-top: 40px; 
+            }
+            .signature-line { 
+                width: 150px; 
+                height: 1px; 
+                background: #ccc; 
+                margin-bottom: 10px; 
+            }
+        </style>
+    </head>
+    <body>
+        <div class="invoice-container">
+            <div class="header">
+                <div>
+                    <div class="title">INVOICE</div>
+                    <div class="invoice-number">INV- 2024-TEST-001</div>
+                </div>
+                <div>
+                    <div class="company-name">Test Company Ltd</div>
+                </div>
+            </div>
+
+            <div class="details">
+                <div class="seller-info">
+                    <h3>Test Company Ltd</h3>
+                    <p>123 Test Street, Test City, TC 12345</p>
+                    <p>test@testcompany.com</p>
+                    <p><strong>GB VAT TC123456789</strong></p>
+                </div>
+                <div class="invoice-details">
+                    <div class="detail-item">
+                        <div class="detail-label">Date of Issue</div>
+                        <div class="detail-value">2024-01-15</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Due Date</div>
+                        <div class="detail-value">2024-02-15</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Currency</div>
+                        <div class="detail-value">EUR</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="billing-section">
+                <div class="bill-to">
+                    <h3>Bill To</h3>
+                    <h4>Test Client GmbH</h4>
+                    <p>456 Client Avenue, Test City, TC 67890</p>
+                    <p>accounts@testclient.de</p>
+                    <p><strong>DE VAT TC987654321</strong></p>
+                </div>
+                <div class="ship-to">
+                    <h3>Ship To</h3>
+                    <h4>Test Client GmbH</h4>
+                    <p>456 Client Avenue, Test City, TC 67890</p>
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th class="text-right">Quantity</th>
+                        <th class="text-right">Unit Price</th>
+                        <th class="text-right">Tax</th>
+                        <th class="text-right">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                        <tr>
+                            <td>Test Service</td>
+                            <td class="text-right">1</td>
+                            <td class="text-right">€1,000.00</td>
+                            <td class="text-right">20%</td>
+                            <td class="text-right"><strong>€1,000.00</strong></td>
+                        </tr>
+                    
+                </tbody>
+            </table>
+
+            <div class="totals">
+                <div class="total-row">
+                    <span class="total-label">Subtotal</span>
+                    <span class="total-value">€1,000.00</span>
+                </div>
+                <div class="total-row">
+                    <span class="total-label">VAT - DE (20%)</span>
+                    <span class="total-value">€200.00</span>
+                </div>
+                <div class="total-row final-total">
+                    <span class="total-label">Total</span>
+                    <span class="total-value">€1,200.00</span>
+                </div>
+            </div>
+
+            
+                <div class="payment-info">
+                    <h3>Payment Information</h3>
+                    <p><strong>Payment Method:</strong> Bank Transfer</p>
+                    <p><strong>Due Date:</strong> 2024-02-15</p>
+                    <p><strong>Payment Terms:</strong> Net 30 days</p>
+                </div>
+            
+
+            
+                <div class="notes">
+                    <h3>Notes</h3>
+                    <p>This is a test invoice for API feature verification.</p>
+                </div>
+            
+
+            
+                <div class="signature">
+                    <div class="signature-line"></div>
+                    <p><strong>Test User</strong></p>
+                    <p>Test Manager</p>
+                </div>
+            
+        </div>
+    </body>
+    </html>
+  

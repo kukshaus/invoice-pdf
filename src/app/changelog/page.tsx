@@ -56,7 +56,7 @@ const changelogData: ChangelogEntry[] = [
     version: '1.0.0',
     date: '2023-12-01',
     title: 'Initial Release',
-    description: 'First public release of EasyInvoicePDF',
+    description: 'First public release of InvoicePDF',
     type: 'feature',
     changes: [
       'Basic invoice generation',
@@ -107,7 +107,7 @@ export default function ChangelogPage() {
           <div className="text-center">
             <h1 className="text-3xl font-bold text-gray-900 mb-4">Changelog</h1>
             <p className="text-lg text-gray-600">
-              Track the latest updates and improvements to EasyInvoicePDF
+              Track the latest updates and improvements to InvoicePDF
             </p>
           </div>
         </div>

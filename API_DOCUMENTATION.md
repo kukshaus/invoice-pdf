@@ -24,6 +24,7 @@ Creates a new invoice with the provided data and returns HTML preview, PDF (base
 
 ```typescript
 interface InvoiceData {
+  includeJsonData?: boolean;        // Optional: Set to true to include JSON response data (default: false)
   general: {
     invoiceNumber: string;           // Legacy field (optional)
     invoiceNumberPrefix: string;     // Required: Invoice prefix (e.g., "INV-")
@@ -89,7 +90,7 @@ interface InvoiceItem {
 }
 ```
 
-#### Example Request
+#### Example Request - Default (PDF Response)
 
 ```json
 {
@@ -172,9 +173,109 @@ interface InvoiceItem {
 }
 ```
 
+#### Example Request - JSON Response
+
+```json
+{
+  "includeJsonData": true,
+  "general": {
+    "invoiceNumber": "INV-2024-001",
+    "invoiceNumberPrefix": "INV-",
+    "invoiceNumberValue": "2024-001",
+    "issueDate": "2024-01-15",
+    "dueDate": "2024-02-15",
+    "serviceDate": "2024-01-10",
+    "currency": "EUR",
+    "language": "en",
+    "template": "default",
+    "dateFormat": "YYYY-MM-DD",
+    "paymentLinkUrl": "https://payment.example.com/pay/123",
+    "companyLogo": "https://example.com/logo.png"
+  },
+  "seller": {
+    "name": "Tech Solutions Ltd",
+    "address": "123 Business Street, London, UK, SW1A 1AA",
+    "vatNumber": "GB123456789",
+    "email": "contact@techsolutions.com",
+    "accountNumber": "12345678",
+    "swiftBic": "BARCGB22",
+    "countryCode": "GB",
+    "showVatInPDF": true,
+    "showAccountInPDF": false,
+    "showSwiftInPDF": false,
+    "notes": "Thank you for your business!",
+    "showNotesInPDF": true
+  },
+  "buyer": {
+    "name": "Client Company GmbH",
+    "address": "456 Client Avenue, Berlin, Germany, 10115",
+    "vatNumber": "DE987654321",
+    "email": "accounts@clientcompany.de",
+    "countryCode": "DE"
+  },
+  "items": [
+    {
+      "id": "item-1",
+      "description": "Web Development Services",
+      "quantity": 1,
+      "unitPrice": 2500.00,
+      "vatRate": 20
+    },
+    {
+      "id": "item-2",
+      "description": "UI/UX Design",
+      "quantity": 1,
+      "unitPrice": 1500.00,
+      "vatRate": 20
+    },
+    {
+      "id": "item-3",
+      "description": "Project Management",
+      "quantity": 10,
+      "unitPrice": 100.00,
+      "vatRate": 20
+    }
+  ],
+  "payment": {
+    "method": "Bank Transfer",
+    "dueDate": "2024-02-15",
+    "terms": "Net 30 days",
+    "showMethodInPDF": true,
+    "showDueDateInPDF": true,
+    "showTermsInPDF": true
+  },
+  "notes": {
+    "content": "Please include invoice number as payment reference. Late payments may incur additional charges.",
+    "showInPDF": true
+  },
+  "signature": {
+    "showInPDF": true,
+    "name": "John Smith",
+    "title": "Managing Director"
+  },
+  "template": "default"
+}
+```
+```
+
 #### Response
 
-**Success Response (200 OK)**
+**Default Response (200 OK) - PDF Document**
+When `includeJsonData` is not set or set to `false`, the API returns the PDF document directly:
+
+- **Content-Type:** `application/pdf`
+- **Content-Disposition:** `attachment; filename="invoice-{prefix}{number}.pdf"`
+- **Body:** Raw PDF binary data
+
+**HTML Response (200 OK) - When ?html=true**
+When the `html=true` URL parameter is added, the API returns the HTML document:
+
+- **Content-Type:** `text/html`
+- **Content-Disposition:** `attachment; filename="invoice-{prefix}{number}.html"`
+- **Body:** Raw HTML content (can be converted to PDF on client side)
+
+**JSON Response (200 OK) - When includeJsonData=true**
+When `includeJsonData` is set to `true`, the API returns a JSON response with all data:
 
 ```json
 {
@@ -189,6 +290,9 @@ interface InvoiceItem {
     "htmlPreview": "<!DOCTYPE html>...",
     "pdfBase64": "JVBERi0xLjQKJcOkw7zDtsO...",
     "pdfSize": 45678,
+    "pdfHtml": "<!DOCTYPE html>...",
+    "pdfHtmlBase64": "PCFET0NUWVBFIGh0bWw+...",
+    "pdfHtmlSize": 45678,
     "id": "507f1f77bcf86cd799439011",
     "databaseId": "507f1f77bcf86cd799439011",
     "message": "Invoice generated successfully"
@@ -283,7 +387,9 @@ The API supports 150+ currencies including:
 
 ## Usage Examples
 
-### cURL Example
+### cURL Examples
+
+#### Default PDF Response
 
 ```bash
 curl -X POST https://your-domain.com/api/generate-invoice \
@@ -348,10 +454,82 @@ curl -X POST https://your-domain.com/api/generate-invoice \
       "title": "CEO"
     },
     "template": "default"
+  }' \
+  --output invoice.pdf
+```
+
+#### JSON Response with PDF Base64
+
+```bash
+curl -X POST https://your-domain.com/api/generate-invoice \
+  -H "Content-Type: application/json" \
+  -d '{
+    "includeJsonData": true,
+    "general": {
+      "invoiceNumberPrefix": "INV-",
+      "invoiceNumberValue": "2024-001",
+      "issueDate": "2024-01-15",
+      "dueDate": "2024-02-15",
+      "serviceDate": "2024-01-10",
+      "currency": "EUR",
+      "language": "en",
+      "template": "default",
+      "dateFormat": "YYYY-MM-DD"
+    },
+    "seller": {
+      "name": "My Company",
+      "address": "123 Business St, City, Country",
+      "vatNumber": "VAT123456789",
+      "email": "contact@mycompany.com",
+      "accountNumber": "12345678",
+      "swiftBic": "BARCGB22",
+      "countryCode": "GB",
+      "showVatInPDF": true,
+      "showAccountInPDF": false,
+      "showSwiftInPDF": false,
+      "notes": "",
+      "showNotesInPDF": false
+    },
+    "buyer": {
+      "name": "Client Company",
+      "address": "456 Client Ave, City, Country",
+      "vatNumber": "VAT987654321",
+      "email": "accounts@client.com",
+      "countryCode": "DE"
+    },
+    "items": [
+      {
+        "id": "item-1",
+        "description": "Consulting Services",
+        "quantity": 1,
+        "unitPrice": 1000.00,
+        "vatRate": 20
+      }
+    ],
+    "payment": {
+      "method": "Bank Transfer",
+      "dueDate": "2024-02-15",
+      "terms": "Net 30 days",
+      "showMethodInPDF": true,
+      "showDueDateInPDF": true,
+      "showTermsInPDF": true
+    },
+    "notes": {
+      "content": "Thank you for your business!",
+      "showInPDF": true
+    },
+    "signature": {
+      "showInPDF": true,
+      "name": "John Doe",
+      "title": "CEO"
+    },
+    "template": "default"
   }'
 ```
 
-### JavaScript/Node.js Example
+### JavaScript/Node.js Examples
+
+#### Default HTML Response
 
 ```javascript
 const response = await fetch('https://your-domain.com/api/generate-invoice', {
@@ -422,8 +600,123 @@ const response = await fetch('https://your-domain.com/api/generate-invoice', {
   })
 });
 
+// Response is HTML content
+const htmlContent = await response.text();
+
+// Save as HTML file
+const blob = new Blob([htmlContent], { type: 'text/html' });
+const url = URL.createObjectURL(blob);
+
+// Download the HTML
+const link = document.createElement('a');
+link.href = url;
+link.download = 'invoice-INV-2024-001.html';
+link.click();
+URL.revokeObjectURL(url);
+
+// Or convert to PDF using client-side library
+// Example using html2pdf.js
+import html2pdf from 'html2pdf.js';
+const element = document.createElement('div');
+element.innerHTML = htmlContent;
+document.body.appendChild(element);
+html2pdf().from(element).save('invoice-INV-2024-001.pdf');
+```
+
+#### JSON Response with HTML Content
+
+```javascript
+const response = await fetch('https://your-domain.com/api/generate-invoice', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    includeJsonData: true,
+    general: {
+      invoiceNumberPrefix: "INV-",
+      invoiceNumberValue: "2024-001",
+      issueDate: "2024-01-15",
+      dueDate: "2024-02-15",
+      serviceDate: "2024-01-10",
+      currency: "EUR",
+      language: "en",
+      template: "default",
+      dateFormat: "YYYY-MM-DD"
+    },
+    seller: {
+      name: "My Company",
+      address: "123 Business St, City, Country",
+      vatNumber: "VAT123456789",
+      email: "contact@mycompany.com",
+      accountNumber: "12345678",
+      swiftBic: "BARCGB22",
+      countryCode: "GB",
+      showVatInPDF: true,
+      showAccountInPDF: false,
+      showSwiftInPDF: false,
+      notes: "",
+      showNotesInPDF: false
+    },
+    buyer: {
+      name: "Client Company",
+      address: "456 Client Ave, City, Country",
+      vatNumber: "VAT987654321",
+      email: "accounts@client.com",
+      countryCode: "DE"
+    },
+    items: [
+      {
+        id: "item-1",
+        description: "Consulting Services",
+        quantity: 1,
+        unitPrice: 1000.00,
+        vatRate: 20
+      }
+    ],
+    payment: {
+      method: "Bank Transfer",
+      dueDate: "2024-02-15",
+      terms: "Net 30 days",
+      showMethodInPDF: true,
+      showDueDateInPDF: true,
+      showTermsInPDF: true
+    },
+    notes: {
+      content: "Thank you for your business!",
+      showInPDF: true
+    },
+    signature: {
+      showInPDF: true,
+      name: "John Doe",
+      title: "CEO"
+    },
+    template: "default"
+  })
+});
+
 const result = await response.json();
 console.log(result);
+
+// Use HTML content for PDF conversion
+if (result.success && result.data.pdfHtml) {
+  // Save as HTML file
+  const htmlBlob = new Blob([result.data.pdfHtml], { type: 'text/html' });
+  const url = URL.createObjectURL(htmlBlob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `invoice-${result.data.invoiceNumber}.html`;
+  link.click();
+  URL.revokeObjectURL(url);
+  
+  // Or convert to PDF using client-side library
+  // Example using html2pdf.js
+  import html2pdf from 'html2pdf.js';
+  const element = document.createElement('div');
+  element.innerHTML = result.data.pdfHtml;
+  document.body.appendChild(element);
+  html2pdf().from(element).save(`invoice-${result.data.invoiceNumber}.pdf`);
+}
 ```
 
 ### Python Example
@@ -502,16 +795,55 @@ print(json.dumps(result, indent=2))
 
 ## Working with the Response
 
-### HTML Preview
+### Default PDF Response
+
+When `includeJsonData` is not set or is `false`, the API returns the PDF document directly. You can:
+
+- Save the response directly as a PDF file
+- Stream it to the client for download
+- Process it as binary data
+
+### HTML Response
+
+When `includeJsonData` is not set or is `false` AND `?html=true` is added to the URL, the API returns the HTML document. You can:
+
+- Save the response directly as an HTML file
+- Convert it to PDF using client-side libraries (like jsPDF, html2pdf.js)
+- Display it in a web browser
+- Process it as text content
+
+### JSON Response with PDF and HTML Content
+
+When `includeJsonData` is set to `true`, the API returns a JSON response containing:
+
+#### HTML Preview
 
 The `htmlPreview` field contains a complete HTML document that can be:
 - Displayed in a web browser
 - Embedded in an iframe
 - Converted to other formats
 
-### PDF Base64
+#### PDF Base64
 
 The `pdfBase64` field contains the PDF as a base64-encoded string. To use it:
+
+```javascript
+// Convert base64 to PDF
+const pdfBuffer = Buffer.from(result.data.pdfBase64, 'base64');
+fs.writeFileSync('invoice.pdf', pdfBuffer);
+
+// Or create a blob for download
+const blob = new Blob([pdfBuffer], { type: 'application/pdf' });
+const url = URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = url;
+a.download = 'invoice.pdf';
+a.click();
+```
+
+#### PDF HTML
+
+The `pdfHtml` field contains the HTML content optimized for PDF conversion. To use it:
 
 ```javascript
 // Convert base64 to blob

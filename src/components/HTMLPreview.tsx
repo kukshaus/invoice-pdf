@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { PDFComponents } from './PDFComponents';
-import { Eye, Download, Share2 } from 'lucide-react';
+import { Eye, Download } from 'lucide-react';
 import { ClientOnly } from './ClientOnly';
 import { pdf } from '@react-pdf/renderer';
 import { InvoicePDF } from './InvoicePDF';
@@ -284,10 +284,6 @@ export const HTMLPreview: React.FC<HTMLPreviewProps> = ({ data, isFormValid }) =
           <div className="p-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                                 <button className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                   <Share2 className="h-4 w-4" />
-                   <span>{getTranslation(data.general.language, 'shareLink')}</span>
-                 </button>
                  <button 
                    onClick={() => setShowPDFModal(true)}
                    className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
