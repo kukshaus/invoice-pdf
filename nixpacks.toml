@@ -1,12 +1,16 @@
 [variables]
-NIXPACKS_NO_CACHE = "1"
+NODE_VERSION = "20"
+PNPM_VERSION = "10"
+
+[providers]
+nodejs = { version = "20" }
 
 [phases.setup]
 nixPkgs = ["nodejs_20", "pnpm"]
 
 [phases.install]
 cmds = [
-  "pnpm install --no-frozen-lockfile"
+  "pnpm install --no-frozen-lockfile --production=false"
 ]
 
 [phases.build]
