@@ -113,6 +113,18 @@ async function testAPI() {
       fs.writeFileSync('invoice-preview.html', result.data.htmlPreview);
       console.log('💾 HTML preview saved to: invoice-preview.html');
       
+      // Save PDF to file if available
+      if (result.data.pdfBase64) {
+        console.log('📄 PDF Base64 length:', result.data.pdfBase64.length, 'characters');
+        console.log('📊 PDF Size:', result.data.pdfSize, 'bytes');
+        
+        const pdfBuffer = Buffer.from(result.data.pdfBase64, 'base64');
+        fs.writeFileSync('invoice.pdf', pdfBuffer);
+        console.log('💾 PDF saved to: invoice.pdf');
+      } else {
+        console.log('⚠️  No PDF generated (pdfBase64 not found in response)');
+      }
+      
     } else {
       console.error('❌ API Error:', result.error);
       if (result.errors) {

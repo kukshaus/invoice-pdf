@@ -358,6 +358,22 @@ export async function POST(request: NextRequest) {
     // Generate HTML preview
     const htmlPreview = generateHTMLPreview(invoiceData);
 
+    // Generate PDF
+    let pdfBuffer: Buffer | null = null;
+    try {
+      console.log('Starting PDF generation...');
+      const { pdf } = await import('@react-pdf/renderer');
+      console.log('PDF renderer imported successfully');
+      const { InvoicePDFDocument } = await import('@/lib/pdf-generator-basic');
+      console.log('PDF document component imported successfully');
+      const pdfDoc = await pdf(InvoicePDFDocument({ data: invoiceData })).toBuffer();
+      pdfBuffer = pdfDoc;
+      console.log('PDF generated successfully, size:', pdfBuffer.length, 'bytes');
+    } catch (pdfError) {
+      console.error('PDF generation error:', pdfError);
+      // Continue without PDF if generation fails
+    }
+
     // Connect to MongoDB and save invoice (optional)
     let savedInvoice = null;
     if (process.env.MONGODB_URI) {
@@ -421,6 +437,12 @@ export async function POST(request: NextRequest) {
     if (savedInvoice) {
       response.data.id = savedInvoice._id;
       response.data.databaseId = savedInvoice._id.toString();
+    }
+
+    // Add PDF as base64 if generated
+    if (pdfBuffer) {
+      response.data.pdfBase64 = pdfBuffer.toString('base64');
+      response.data.pdfSize = pdfBuffer.length;
     }
 
     return NextResponse.json(response);
