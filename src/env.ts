@@ -36,4 +36,6 @@ export const env = createEnv({
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
   },
+  // Skip env validation during build time
+  skipValidation: !!process.env.SKIP_ENV_VALIDATION,
 });

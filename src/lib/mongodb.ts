@@ -1,10 +1,11 @@
 import { MongoClient } from 'mongodb';
 
-if (!process.env.MONGODB_URI) {
+// Skip validation during build time
+if (!process.env.MONGODB_URI && !process.env.SKIP_ENV_VALIDATION) {
   throw new Error('Invalid/Missing environment variable: "MONGODB_URI"');
 }
 
-const uri = process.env.MONGODB_URI;
+const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/fallback';
 const options = {
   maxPoolSize: 10, // Limit connection pool
   serverSelectionTimeoutMS: 5000, // Timeout after 5s
@@ -21,7 +22,7 @@ const isValidMongoURI = (uri: string): boolean => {
   }
 };
 
-if (!isValidMongoURI(uri)) {
+if (!isValidMongoURI(uri) && !process.env.SKIP_ENV_VALIDATION) {
   throw new Error('Invalid MongoDB URI format');
 }
 
